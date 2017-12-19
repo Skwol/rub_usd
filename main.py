@@ -61,11 +61,14 @@ def remove_repeted_days(frame, initial_day):
     """Removing rows, where days are the same nearby, last entry should be the selling day. """
     sell_day = initial_day
     dates_to_remove = []
+    previous_date = None
     for date, row in frame.iterrows():
         if row[WEEKDAY] == initial_day:
-            dates_to_remove.append(date)
+            # remove secondary entry (current) if it is sell, remove first entry (previous) if buy
+            dates_to_remove.append(date if initial_day == sell_day else previous_date)
         else:
             initial_day = row[WEEKDAY]
+        previous_date = date
     if sell_day != frame.iloc[-1:][WEEKDAY][0]:
         #  last day should be the day we sell
         dates_to_remove.append(frame.iloc[-1:].index[0])
